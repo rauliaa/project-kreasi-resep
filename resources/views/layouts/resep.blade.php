@@ -13,17 +13,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ asset('delfood-1.0.0/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('delfood-1.0.0/css/bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/responsive.css') }}"> <!-- Pastikan file ini ada di public/css/responsive.css -->
+    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha256-mLBIhmBvigTFWPSCtvdu6a76T+3Xyt+K571hupeFLg4=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" integrity="sha256-UK1EiopXIL+KVhfbFa8xrmAWPeBjMVdvYMYkTAEv/HI=" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css" integrity="undefined" crossorigin="anonymous" />
 
     @stack('styles')
 </head>
 
 <body>
     <!-- Include header -->
-    @include('partials.header')
+    @include('partials.headeresep')
 
     <!-- Main Content -->
     <div class="container">
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Include footer -->
-    @include('partials.footer')
+    @include('partials.footeresep')
 
     <!-- Scripts -->
     <script src="{{ asset('delfood-1.0.0/js/jquery-3.4.1.min.js') }}"></script>
@@ -39,13 +39,6 @@
     <script src="{{ asset('delfood-1.0.0/js/custom.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js" integrity="sha256-Zr3vByTlMGQhvMfgkQ5BtWRSKBGa2QlspKYJnkjZTmo=" crossorigin="anonymous"></script>
-
-    <script>
-        $(document).ready(function() {
-            // Inisialisasi Slick
-            $('.your-slider-class').slick(); // Ganti '.your-slider-class' dengan kelas yang sesuai untuk slider Anda
-        });
-    </script>
 
     @stack('scripts')
 </body>

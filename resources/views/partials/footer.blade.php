@@ -19,7 +19,7 @@
                         <a href="{{ url('/') }}" class="text-decoration-none">Home</a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="{{ url('/about') }}" class="text-decoration-none">About</a>
+                        <a href="{{ url('recipes') }}" class="text-decoration-none">Resep</a>
                     </li>
                     <li class="list-inline-item">
                         <a href="{{ url('/blog') }}" class="text-decoration-none">Blog</a>

@@ -24,7 +24,7 @@
               <h4>
                 Breakfast
               </h4>
-              <a href="">
+              <a href="recipes">
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
               </a>
             </div>
@@ -39,7 +39,7 @@
               <h4>
                 Lunch
               </h4>
-              <a href="">
+              <a href="recipes">
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
               </a>
             </div>
@@ -54,7 +54,7 @@
               <h4>
                 Dinner
               </h4>
-              <a href="">
+              <a href="recipes">
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
               </a>
             </div>
@@ -79,7 +79,7 @@
                         <div class="detail-box">
                             <h4>Tasty Food For You</h4>
                             <p>There isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined.</p>
-                            <a href="#">
+                            <a href="recipes">
                                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
                             </a>
                         </div>
@@ -93,7 +93,7 @@
                         <div class="detail-box">
                             <h4>Breakfast For You</h4>
                             <p>There isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined.</p>
-                            <a href="#">
+                            <a href="recipes">
                                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
                             </a>
                         </div>
