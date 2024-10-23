@@ -1,27 +1,29 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Recipe;
-use App\Models\Category;
-use App\Models\Ingredient;
-use App\Models\Step;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Recipe;
+use App\Models\Category;
+use App\Models\Subcategory;
+use App\Models\Purpose;
+use App\Models\Ingredient;
+use App\Models\Step;
+
 
 class RecipeController extends Controller
 {
     // Menampilkan daftar semua resep
     public function index()
     {
-        $recipes = Recipe::with('categories')->get();
+        $recipes = Recipe::with(['categories', 'subcategory', 'purpose'])->get();
         return view('recipes.index', compact('recipes'));
     }
 
     // Menampilkan detail resep
     public function show($id)
     {
-        $recipe = Recipe::with(['ingredients', 'steps', 'comments.user', 'categories'])->findOrFail($id);
+        $recipe = Recipe::with(['ingredients', 'steps', 'comments.user', 'categories', 'subcategory', 'purpose'])->findOrFail($id);
         return view('recipes.show', compact('recipe'));
     }
 
@@ -29,7 +31,9 @@ class RecipeController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('recipes.create', compact('categories'));
+        $subcategories = Subcategory::all();
+        $purposes = Purpose::all();
+        return view('recipes.create', compact('categories', 'subcategories', 'purposes'));
     }
 
     // Menyimpan resep baru ke database
@@ -43,6 +47,8 @@ class RecipeController extends Controller
             'steps' => 'required|array',
             'steps.*' => 'required|string',
             'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'nullable|exists:subcategories,id',
+            'purpose_id' => 'nullable|exists:purposes,id',
             'prep_time' => 'required|integer',
             'cook_time' => 'required|integer',
             'servings' => 'required|integer',
@@ -56,6 +62,8 @@ class RecipeController extends Controller
         $recipe->servings = $request->servings;
         $recipe->description = $request->description;
         $recipe->category_id = $request->category_id;
+        $recipe->subcategory_id = $request->subcategory_id;
+        $recipe->purpose_id = $request->purpose_id;
 
         // Mengelola upload gambar
         if ($request->hasFile('image')) {
@@ -88,7 +96,9 @@ class RecipeController extends Controller
     {
         $recipe = Recipe::with('ingredients', 'steps')->findOrFail($id);
         $categories = Category::all();
-        return view('recipes.edit', compact('recipe', 'categories'));
+        $subcategories = Subcategory::all();
+        $purposes = Purpose::all();
+        return view('recipes.edit', compact('recipe', 'categories', 'subcategories', 'purposes'));
     }
 
     // Memperbarui resep di database
@@ -102,6 +112,8 @@ class RecipeController extends Controller
             'steps' => 'required|array',
             'steps.*' => 'required|string',
             'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'nullable|exists:subcategories,id',
+            'purpose_id' => 'nullable|exists:purposes,id',
             'prep_time' => 'required|integer',
             'cook_time' => 'required|integer',
             'servings' => 'required|integer',
@@ -115,6 +127,8 @@ class RecipeController extends Controller
         $recipe->servings = $request->servings;
         $recipe->description = $request->description;
         $recipe->category_id = $request->category_id;
+        $recipe->subcategory_id = $request->subcategory_id;
+        $recipe->purpose_id = $request->purpose_id;
 
         // Mengelola upload gambar
         if ($request->hasFile('image')) {
@@ -161,74 +175,25 @@ class RecipeController extends Controller
     // Menampilkan resep berdasarkan kategori
     public function category($category)
     {
-        $recipes = Recipe::where('category', $category)->get();
+        $recipes = Recipe::where('category_id', $category)->get();
         return view('recipes.index', compact('recipes'));
     }
 
-    // Menampilkan resep berdasarkan metode memasak
-    public function cookingMethod($method)
+    // Menampilkan resep berdasarkan subkategori
+    public function subcategory($subcategory)
     {
-        $recipes = Recipe::where('cooking_method', $method)->get();
+        $recipes = Recipe::where('subcategory_id', $subcategory)->get();
         return view('recipes.index', compact('recipes'));
     }
 
-    public function showByMethod($method)
+    // Menampilkan resep berdasarkan tujuan
+    public function byPurpose($purpose)
     {
-        $recipes = Recipe::where('cooking_method', '=', $method)->get();
-
-        return view('recipes.index', ['recipes' => $recipes]);
+        $recipes = Recipe::where('purpose_id', $purpose)->get();
+        return view('recipes.index', compact('recipes'));
     }
 
     // Menampilkan resep berdasarkan bahan
-    public function bahan($bahan)
-    {
-        $recipes = Recipe::where('bahan', $bahan)->get();
-        return view('recipes.index', compact('recipes'));
-    }
-
-    // Menampilkan resep paling populer
-    public function populer()
-    {
-        $recipes = Recipe::orderBy('views', 'desc')->take(10)->get();
-        return view('recipes.index', compact('recipes'));
-    }
-
-    // Menampilkan resep favorit
-    public function favorit()
-    {
-        $recipes = Recipe::orderBy('favorites', 'desc')->take(10)->get();
-        return view('recipes.index', compact('recipes'));
-    }
-
-    // Menampilkan resep terbaru
-    public function terbaru()
-    {
-        $recipes = Recipe::orderBy('created_at', 'desc')->take(10)->get();
-        return view('recipes.index', compact('recipes'));
-    }
-
-    // Menampilkan resep yang sudah teruji
-    public function teruji()
-    {
-        $recipes = Recipe::where('is_verified', true)->get();
-        return view('recipes.index', compact('recipes'));
-    }
-
-    public function byType($type)
-    {
-        // Ambil data resep berdasarkan tipe yang diberikan
-        $recipes = Recipe::where('type', '=', $type)->get();
-        
-        // Tampilkan view dengan data resep yang sesuai
-        return view('recipes.index', ['recipes' => $recipes]);
-    }
-
-    public function byCuisine($cuisine)
-    {
-        // Example logic to get recipes by cuisine
-        $recipes = Recipe::where('cuisine', $cuisine)->get();
-        return view('recipes.index', compact('recipes'));
-    }
     public function byIngredient($ingredient)
     {
         $recipes = Recipe::whereHas('ingredients', function ($query) use ($ingredient) {
@@ -237,56 +202,27 @@ class RecipeController extends Controller
         return view('recipes.index', compact('recipes'));
     }
 
-    // Menampilkan halaman bahan makanan
-    public function showIngredients()
-    {
-        $ingredients = Ingredient::all(); // Mengambil semua bahan dari database
-        return view('bahan', compact('ingredients'));
-    }
-
-    // Mengambil resep berdasarkan bahan yang dipilih
-    public function getRecipesByIngredients(Request $request)
-    {
-        $ingredients = $request->input('ingredients', []);
-
-        if (empty($ingredients)) {
-            return response()->json([]);
-        }
-
-        $recipes = Recipe::whereHas('ingredients', function ($query) use ($ingredients) {
-            $query->whereIn('name', $ingredients);
-        })->get();
-
-        return response()->json($recipes);
-    }
-
-    // Metode untuk menampilkan resep berdasarkan tujuan makanan
-    public function byPurpose($purpose)
-    {
-        $recipes = Recipe::where('purpose', $purpose)->get();
-        return view('recipes.index', compact('recipes'));
-    }
-
     // Menampilkan resep berdasarkan rekomendasi
     public function byRecommendation($type)
     {
         switch ($type) {
             case 'Resep Populer':
-                $recipes = Recipe::orderBy('created_at', 'desc')->take(10)->get(); // Ganti dengan kolom yang ada
+                $recipes = Recipe::orderBy('views', 'desc')->take(10)->get();
                 break;
             case 'Resep Favorit':
-                $recipes = Recipe::orderBy('created_at', 'desc')->take(10)->get(); // Ganti dengan kolom yang ada
+                $recipes = Recipe::orderBy('favorites', 'desc')->take(10)->get();
                 break;
             case 'Resep Terbaru':
                 $recipes = Recipe::orderBy('created_at', 'desc')->take(10)->get();
                 break;
+            case 'Resep Teruji':
+                $recipes = Recipe::where('is_verified', true)->get();
+                break;
             default:
-                $recipes = collect(); // Jika tidak ada tipe yang cocok
+                $recipes = collect();
                 break;
         }
 
         return view('recipes.index', compact('recipes'));
     }
-
-
 }

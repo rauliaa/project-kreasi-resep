@@ -4,24 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Ingredient;
+use App\Models\Recipe;
 
 class Ingredient extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'recipe_id',
-        'name',
-        'quantity',
-        'unit',
-    ];
+    protected $fillable = ['name', 'quantity', 'recipe_id'];
 
-    /**
-     * Get the recipe that owns the ingredient.
-     */
-    public function recipes()
+    public function recipe()
     {
-        return $this->belongsToMany(Recipe::class);
+        return $this->belongsTo(Recipe::class);
     }
 }

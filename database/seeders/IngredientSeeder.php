@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB; // Tambahkan ini
+use Illuminate\Support\Facades\DB; 
 use Faker\Factory as Faker;
 
 class IngredientSeeder extends Seeder
@@ -16,10 +16,9 @@ class IngredientSeeder extends Seeder
         foreach (range(1, 50) as $index) {
             DB::table('ingredients')->insert([
                 'name' => $faker->word,
-                'quantity' => $faker->randomNumber(2),
-                'unit' => $faker->randomElement(['grams', 'liters', 'pieces']),
-                'description' => $faker->sentence,
-                'recipe_id' => DB::table('recipes')->inRandomOrder()->first()->id, // Mengambil recipe_id acak dari resep
+                'quantity' => $faker->randomFloat(2, 1, 100),
+                'ingredient' => $faker->sentence, 
+                'recipe_id' => DB::table('recipes')->inRandomOrder()->first()->id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

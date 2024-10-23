@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -33,18 +31,18 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast to native types.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
+    /**
+     * Get the recipes associated with the user.
+     */
     public function recipes()
     {
         return $this->hasMany(Recipe::class);
@@ -63,8 +61,9 @@ class User extends Authenticatable
      */
     public function favorites()
     {
-        return $this->hasMany(Favorite::class); // Menghubungkan user dengan model Favorite
+        return $this->belongsToMany(Recipe::class, 'favorites')->withTimestamps();
     }
+
 
 }
 

@@ -5,19 +5,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('recipes', function (Blueprint $table) {
-            $table->foreignId('purpose_id')->nullable()->constrained('purposes')->onDelete('set null');
+            // Cek apakah kolom sudah ada sebelum menambahkannya
+            if (!Schema::hasColumn('recipes', 'purpose_id')) {
+                $table->foreignId('purpose_id')->nullable()->constrained('purposes')->onDelete('set null');
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('recipes', function (Blueprint $table) {

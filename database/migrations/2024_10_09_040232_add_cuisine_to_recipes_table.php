@@ -6,21 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
+    public function up(): void
     {
         Schema::table('recipes', function (Blueprint $table) {
-            $table->string('cuisine')->nullable(); // atau sesuai dengan tipe data yang Anda butuhkan
+            $table->string('cuisine')->nullable()->change(); 
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('recipes', function (Blueprint $table) {
-            $table->dropColumn('cuisine');
+            $table->dropColumn('cuisine'); 
         });
     }
-
 };
