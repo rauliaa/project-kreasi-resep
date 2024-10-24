@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TipController;
 
 // Rute untuk halaman utama (home)
 Route::get('/', function () {
@@ -48,3 +49,8 @@ Route::get('/favorite-recipes', [FavoriteController::class, 'index'])->name('fav
 
 // Rute untuk menampilkan semua komentar/diskusi pengguna
 Route::get('/user-comments', [CommentController::class, 'index'])->name('user.comments');
+
+
+Route::get('/tips', [TipController::class, 'index'])->name('tips.index');
+Route::get('/tips/{id}', [TipController::class, 'show'])->name('tips.show');
+Route::resource('tips', TipController::class);
