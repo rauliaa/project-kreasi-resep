@@ -46,9 +46,9 @@
     .icon-section {
         display: flex;
         align-items: center;
-        justify-content: flex-start; /* Ubah ke flex-start untuk menyusun item lebih rapat */
+        justify-content: flex-start;
         margin-top: 10px;
-        gap: 10px; /* Tambahkan jarak antar item */
+        gap: 10px;
     }
 
     .icon-section div {
@@ -57,9 +57,9 @@
     }
 
     .icon-section img {
-        width: 30px; /* Kecilkan ukuran ikon jika perlu */
+        width: 30px;
         height: 30px;
-        margin-right: 5px; /* Kecilkan jarak antara ikon dan teks */
+        margin-right: 5px;
     }
 
     .icon-section .badge {
@@ -71,21 +71,36 @@
         margin-right: 10px;
     }
 
-    .save-recipe-btn {
-        background-color: #ffc107;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 8px 15px;
-        display: inline-block;
-        text-align: center;
-        margin-left: 10px; /* Ubah margin left */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
     }
 
-    .save-recipe-btn:hover {
-        background-color: #e0a800;
+    .action-button {
+        background-color: #f8f9fa;
+        border: 2px solid #ced4da;
+        color: #495057;
+        border-radius: 5px;
+        padding: 10px 15px;
+        font-size: 14px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .action-button:hover {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .edit-btn {
+        background-color: #28a745;
+    }
+
+    .delete-btn {
+        background-color: #dc3545;
     }
 
     .rating {
@@ -123,17 +138,10 @@
         color: #007bff;
     }
 
-    .action-section {
-        display: flex;
-        align-items: center;
-        margin-top: 15px;
-    }
-
-    /* Responsive untuk list bahan dengan tinggi terbatas pada desktop */
     .list-group {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Menggunakan grid layout */
-        gap: 15px; /* Jarak antar kotak bahan */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
         padding: 0;
         list-style: none;
         margin: 0;
@@ -144,8 +152,8 @@
         border: 1px solid #ddd;
         margin-bottom: 5px;
         border-radius: 5px;
-        text-align: center; /* Agar teks di tengah */
-        min-height: 80px; /* Tinggi minimum yang seragam */
+        text-align: center;
+        min-height: 80px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -154,27 +162,27 @@
 
     @media (min-width: 768px) {
         .list-group {
-            max-height: 400px; /* Batasi tinggi list */
-            overflow-y: auto; /* Aktifkan scroll jika terlalu panjang */
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .list-group-item {
-            flex: 0 0 48%; /* Membuat 2 kolom di layar besar */
+            flex: 0 0 48%;
         }
 
         .list-group-item:nth-child(2n) {
-            margin-right: 0; /* Menghilangkan margin kanan di kolom genap */
+            margin-right: 0;
         }
     }
 
     @media (min-width: 1200px) {
         .list-group-item {
-            flex: 0 0 30%; /* Membuat 3 kolom di layar sangat besar */
+            flex: 0 0 30%;
             margin-right: 2%;
         }
 
         .list-group-item:nth-child(3n) {
-            margin-right: 0; /* Menghilangkan margin kanan di kolom ganjil */
+            margin-right: 0;
         }
     }
 </style>
@@ -202,9 +210,20 @@
                     <img src="{{ asset('delfood-1.0.0/images/prsi.png') }}" alt="Porsi">
                     <span>{{ $recipe->servings }} Porsi</span>
                 </div>
-                <form action="{{ route('favorites.store', $recipe->id) }}" method="POST" style="margin-left: 10px;">
+            </div>
+
+            <!-- Bagian tombol aksi -->
+            <div class="action-buttons">
+                <a href="{{ route('recipes.edit', $recipe->id) }}" class="action-button">
+                    <i class="fa fa-pencil"></i> Edit Resep
+                </a>
+
+                <form action="{{ route('recipes.destroy', $recipe->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus resep ini?');">
                     @csrf
-                    <button type="submit" class="save-recipe-btn">Simpan Resep</button>
+                    @method('DELETE')
+                    <button type="submit" class="action-button delete-btn">
+                        <i class="fa fa-trash"></i> Hapus Resep
+                    </button>
                 </form>
             </div>
 
