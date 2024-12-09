@@ -41,9 +41,11 @@ class Recipe extends Model
     /**
      * Get the ingredients for the recipe.
      */
-    public function ingredients() {
-        return $this->hasMany(Ingredient::class);
+    public function ingredients()
+    {
+        return $this->belongsToMany(Ingredient::class, 'recipe_ingredient');
     }
+    
     
 
     public function instructions()

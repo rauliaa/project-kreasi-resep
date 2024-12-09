@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategorieType; 
 use App\Models\Tip;
 use Illuminate\Http\Request;
 
@@ -11,20 +12,23 @@ class TipController extends Controller
     public function index()
     {
         $tips = Tip::all();
-        return view('tips.index', compact('tips'));
+        $categorieTypes = CategorieType::with('categories')->get();  // Corrected name
+        return view('tips.index', compact('tips', 'categorieTypes'));
     }
 
     // Menampilkan halaman detail tips (show)
     public function show($id)
     {
         $tip = Tip::findOrFail($id);  // Jika data tidak ditemukan, akan muncul 404 error
-        return view('tips.show', compact('tip'));
+        $categorieTypes = CategorieType::with('categories')->get();
+        return view('tips.show', compact('tip', 'categorieTypes'));
     }
 
     // Menampilkan form untuk membuat tips baru (create)
     public function create()
-    {
-        return view('tips.create');
+    {   
+        $categorieTypes = CategorieType::with('categories')->get();
+        return view('tips.create', compact('categorieTypes'));
     }
 
     // Menampilkan form untuk mengedit tips yang sudah ada

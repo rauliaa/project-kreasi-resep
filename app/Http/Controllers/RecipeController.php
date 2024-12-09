@@ -53,9 +53,15 @@ class RecipeController extends Controller
 
     // Menampilkan formulir untuk menambahkan resep baru
     public function create()
-    {
+    {   
+        $ingredients = Ingredient::all();
         $categorieTypes = CategorieType::with('categories')->get();
-        return view('recipes.create', compact('categorieTypes'));
+        $ingredients = DB::table('ingredients')->orderBy('name')->get();
+
+        $groupedIngredients = $ingredients->groupBy(function ($item) {
+            return strtoupper(substr($item->name, 0, 1));
+        });
+        return view('recipes.create', compact('ingredients', 'categorieTypes', 'groupedIngredients'));
     }
     
     public function store(Request $request)
@@ -65,7 +71,10 @@ class RecipeController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'cook_time' => 'required|integer',
-            'ingredients' => 'required|array',
+            'ingredients.*.ingredient_id' => 'required',
+            'ingredients.*.quantity' => 'required|numeric',
+            'ingredients.*.unit' => 'required',
+            'new_ingredients' => 'nullable|array',
             'instructions' => 'required|array',
             'image' => 'nullable|image|max:2048',
             'categorie_id' => 'required|integer',
@@ -88,6 +97,22 @@ class RecipeController extends Controller
         }
     
         $recipe->categorie_id = $request->input('categorie_id');
+
+         // Tambahkan bahan baru ke database
+        if ($request->has('new_ingredients')) {
+            foreach ($request->new_ingredients as $newIngredient) {
+                $ingredient = \App\Models\Ingredient::firstOrCreate([
+                    'name' => ucfirst($newIngredient)
+                ]);
+                $validatedData['ingredients'][] = $ingredient->id;
+            }
+        }
+        
+        if ($request->has('ingredients')) {
+            $recipe->ingredients()->sync($validatedData['ingredients']);
+        }
+   
+
         $recipe->save();
     
         // Redirect with a success message
@@ -316,11 +341,33 @@ class RecipeController extends Controller
     // Menampilkan resep berdasarkan bahan yang tidak memiliki bahan tertentu
     public function showIngredients()
     {
+        // Fetch ingredients from the database
         $ingredients = Ingredient::all();
-        $categorieTypes = CategorieType::with('categories')->get();
-        return view('Ingredients.index', compact('ingredients', 'categorieTypes'));
+    
+        // Group ingredients by their first letter (or any other logic you need)
+        $groupedIngredients = $ingredients->groupBy(function($ingredient) {
+            return strtoupper(substr($ingredient->name, 0, 1)); // Group by the first letter of the name
+        });
+        
+        $recipes = Recipe::all();
+        $categorieTypes = CategorieType::with('categories')->get(); 
+        // Pass the grouped ingredients to the view
+        return view('Ingredients.index', compact('ingredients', 'groupedIngredients', 'recipes', 'categorieTypes'));
     }
 
+    public function getRecipes(Request $request)
+    {
+        $ingredientIds = $request->ingredients;
+        
+        // Ambil resep yang menggunakan bahan-bahan yang dipilih
+        $recipes = Recipe::whereHas('ingredients', function($query) use ($ingredientIds) {
+            $query->whereIn('id', $ingredientIds);
+        })->get();
+
+        return response()->json($recipes);  // Kembalikan resep dalam format JSON
+    }
+    
+    
     public function saveRecipe($recipeId)
     {
         $user = Auth::user(); // Get the authenticated user

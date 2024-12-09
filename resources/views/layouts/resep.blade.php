@@ -29,6 +29,22 @@
             font-size: 14px; /* Mengubah ukuran font item */
             padding: 8px 12px; /* Mengubah padding item */
         }
+        
+        .ingredient-group h5 {
+            margin-bottom: 5px; /* Mengurangi jarak bawah huruf kapital */
+        }
+
+        .ingredient-group .row {
+            margin-top: 0; /* Menghilangkan jarak atas row */
+        }
+
+        .ingredient-group .col-12 {
+            margin-bottom: 2px; /* Mengurangi jarak antara bahan */
+        }
+
+        .ingredient-group {
+            margin-bottom: 10px; /* Mengurangi jarak antar grup huruf */
+        }
     </style>
 </head>
 <body>

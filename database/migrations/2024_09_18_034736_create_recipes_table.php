@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->text('instructions'); 
-            $table->text('ingredient'); 
+            $table->text('ingredients'); 
             $table->integer('cook_time')->nullable();
             $table->string('image')->nullable();
             $table->foreignId('categorie_id')->constrained()->onDelete('cascade');

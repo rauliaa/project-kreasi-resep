@@ -102,6 +102,10 @@ Route::middleware('auth')->prefix('tips')->name('tips.')->group(function () {
 // Ingredient route
 Route::get('/ingredients', [RecipeController::class, 'showIngredients'])->name('ingredients.index');
 Route::get('/ingredients/{ingredient}', [IngredientController::class, 'show'])->name('ingredients.show');
+Route::get('ingredients/search', [IngredientsController::class, 'search'])->name('ingredients.search');
+Route::get('/ingredients', [RecipeController::class, 'showIngredients']);
+Route::post('/get-recipes', [RecipeController::class, 'getRecipes'])->name('get.recipes');
+
 
 // Auth check and redirect URL setting
 Route::get('/check-auth', fn() => response()->json(['authenticated' => auth()->check()]));

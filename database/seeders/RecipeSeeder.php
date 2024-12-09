@@ -21,7 +21,7 @@ class RecipeSeeder extends Seeder
                 'image' => $faker->imageUrl(640, 480, 'food', true),
                 'cook_time' => $faker->numberBetween(5, 120),
                 'categorie_id' => DB::table('categories')->inRandomOrder()->first()->id,
-                'ingredient' => $faker->sentence,
+                'ingredients' => $faker->sentence,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

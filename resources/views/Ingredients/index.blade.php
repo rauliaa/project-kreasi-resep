@@ -40,24 +40,19 @@
 
         <!-- Kolom Kanan: Daftar Resep -->
         <div class="col-md-8">
-        <h2>Recipes using {{ $ingredient->name }}</h2>
-            @if($recipes->count())
-                <ul>
-                    @foreach ($recipes as $recipe)
-                        <li>{{ $recipe->title }}</li>
-                    @endforeach
-                </ul>
-            @else
-                <p>No recipes found for this ingredient.</p>
-            @endif
+            <div id="recipes-placeholder">
+                <h2>Recipes will appear here based on your selected ingredients</h2>
+            </div>
+            <div id="recipes"></div> <!-- Di sini resep yang diambil akan ditampilkan -->
         </div>
+
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Event listener untuk input pencarian bahan
+    // Event listener untuk pencarian bahan
     $('#search-box').on('input', function() {
         let searchQuery = $(this).val().toLowerCase(); // Ambil query pencarian dalam huruf kecil
 
@@ -98,36 +93,34 @@ $(document).ready(function() {
 
         // Tampilkan pesan jika tidak ada bahan yang cocok di seluruh grup
         if (!anyMatch) {
-            // Hapus pesan sebelumnya agar tidak ada duplikat
             $('.ingredient-list').find('.text-muted').remove();
             $('.ingredient-list').append('<p class="text-center text-muted">Bahan tidak ditemukan. Coba kata kunci yang lain, ya.</p>');
         } else {
-            // Hapus pesan jika ada bahan yang cocok
             $('.ingredient-list').find('.text-muted').remove();
         }
     });
 
- // Event listener untuk centang bahan
- $('.ingredient-checkbox').on('change', function() {
+    // Event listener untuk centang bahan
+    $('.ingredient-checkbox').on('change', function() {
         updateRecipeList();
     });
 
     function updateRecipeList() {
         let selectedIngredients = [];
         $('.ingredient-checkbox:checked').each(function() {
-            selectedIngredients.push($(this).val());
+            selectedIngredients.push($(this).val()); // Ambil ID bahan yang dicentang
         });
 
-        // Kirim AJAX untuk mendapatkan resep berdasarkan bahan yang dicentang
+        // Kirim data AJAX untuk mendapatkan resep berdasarkan bahan yang dicentang
         $.ajax({
-            url: '/get-recipes',  // Ganti dengan URL rute yang sesuai
+            url: '/get-recipes',  // Ganti dengan URL rute yang sesuai di Laravel
             method: 'POST',
             data: {
                 ingredients: selectedIngredients,
                 _token: $('input[name="_token"]').val()  // Untuk keamanan CSRF
             },
             success: function(response) {
-                displayRecipes(response);
+                displayRecipes(response);  // Tampilkan resep yang diterima dari server
             },
             error: function() {
                 $('#recipes').html('<p class="text-center text-danger">Gagal memuat resep. Coba lagi nanti.</p>');
@@ -152,74 +145,9 @@ $(document).ready(function() {
             });
         }
 
-        $('#recipes').html(html);
+        $('#recipes').html(html);  // Tampilkan resep yang sesuai di elemen dengan id 'recipes'
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const ingredientItems = document.querySelectorAll('.ingredient-item');
-
-        ingredientItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const ingredientId = this.getAttribute('data-ingredient-id');
-                fetch(`/ingredients/${ingredientId}/recipes`)  // Endpoint API Laravel
-                    .then(response => response.json())
-                    .then(data => {
-                        displayRecipes(data);
-                    })
-                    .catch(error => console.error('Error fetching recipes:', error));
-            });
-        });
-
-        function displayRecipes(recipes) {
-            const recipeContainer = document.getElementById('recipes');
-            const recipeCount = document.getElementById('recipe-count');
-
-            recipeContainer.innerHTML = '';  // Kosongkan daftar sebelumnya
-
-            if (recipes.length === 0) {
-                recipeCount.textContent = 'Tidak ada resep dengan bahan ini.';
-                return;
-            }
-
-            recipeCount.textContent = `${recipes.length} resep ditemukan:`;
-
-            recipes.forEach(recipe => {
-                const recipeCard = `
-                    <div class="card mb-3">
-                        <img src="/delfood-1.0.0/images/${recipe.image}" class="card-img-top" alt="${recipe.title}">
-                        <div class="card-body">
-                            <h5 class="card-title">${recipe.title}</h5>
-                            <p class="card-text">${recipe.description}</p>
-                            <a href="/recipes/${recipe.id}" class="btn btn-primary">Lihat Resep</a>
-                        </div>
-                    </div>
-                `;
-                recipeContainer.innerHTML += recipeCard;
-            });
-        }
-    });
-    $(document).ready(function() {
-    $('#ingredient-search').autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: "{{ route('ingredients.search') }}",
-                data: { term: request.term },
-                success: function(data) {
-                    response(data);  // Data berupa array nama bahan
-                }
-            });
-        },
-        select: function(event, ui) {
-            // Ketika bahan dipilih, tambahkan ke daftar bahan
-            var selectedIngredients = $('#ingredient-list').val();
-            selectedIngredients = selectedIngredients ? selectedIngredients + ',' + ui.item.value : ui.item.value;
-            $('#ingredient-list').val(selectedIngredients);
-            $('#ingredient-search').val('');
-            return false;
-        }
-    });
 });
 
-});
 </script>
 @endsection
