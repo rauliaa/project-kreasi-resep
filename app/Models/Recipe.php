@@ -41,10 +41,15 @@ class Recipe extends Model
     /**
      * Get the ingredients for the recipe.
      */
-    public function ingredients()
-    {
-        return $this->belongsToMany(Ingredient::class, 'recipe_ingredient');
-    }
+
+
+     public function ingredients()
+     {
+         return $this->belongsToMany(Ingredient::class, 'recipe_ingredient', 'recipe_id', 'ingredient_id')
+                     ->withPivot('quantity', 'unit'); // Pastikan kolom tambahan ditambahkan jika ada.
+     }
+     
+
     
     
 

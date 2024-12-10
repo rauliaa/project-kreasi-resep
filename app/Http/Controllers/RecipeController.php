@@ -54,69 +54,67 @@ class RecipeController extends Controller
     // Menampilkan formulir untuk menambahkan resep baru
     public function create()
     {   
-        $ingredients = Ingredient::all();
+        $categories = Categorie::all();
         $categorieTypes = CategorieType::with('categories')->get();
         $ingredients = DB::table('ingredients')->orderBy('name')->get();
 
         $groupedIngredients = $ingredients->groupBy(function ($item) {
             return strtoupper(substr($item->name, 0, 1));
         });
-        return view('recipes.create', compact('ingredients', 'categorieTypes', 'groupedIngredients'));
+        return view('recipes.create', compact('categories', 'ingredients', 'categorieTypes', 'groupedIngredients'));
     }
     
     public function store(Request $request)
     {
-        // Validate the input data
-        $validated = $request->validate([
+        // Validasi input
+        $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'cook_time' => 'required|integer',
-            'ingredients.*.ingredient_id' => 'required',
-            'ingredients.*.quantity' => 'required|numeric',
-            'ingredients.*.unit' => 'required',
-            'new_ingredients' => 'nullable|array',
             'instructions' => 'required|array',
-            'image' => 'nullable|image|max:2048',
-            'categorie_id' => 'required|integer',
+            'instructions.*' => 'string',
+            'cook_time' => 'required|integer|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'categorie_id' => 'required|exists:categories,id',
         ]);
     
-        // Create a new recipe instance
-        $recipe = new Recipe();
-        $recipe->title = $request->input('title');
-        $recipe->description = $request->input('description');
-        $recipe->cook_time = $request->input('cook_time');
+        // Proses untuk menyimpan gambar jika ada
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+        } else {
+            $imageName = null;
+        }
     
-        // Convert ingredients and instructions arrays to comma-separated strings
-        $recipe->ingredients = implode(',', $request->input('ingredients'));
+        // Menyimpan data resep
+        $recipe = new Recipe();
+        $recipe->title = $request->title;
+        $recipe->description = $request->description;
+        $recipe->cook_time = $request->cook_time;
+        $recipe->image = $imageName;
+        $recipe->categorie_id = $request->categorie_id;
+    
+        // Menyimpan instruksi
         $recipe->instructions = implode(',', $request->input('instructions'));
     
-        // Handle image upload if provided
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('recipes', 'public');
-            $recipe->image = $imagePath;
-        }
-    
-        $recipe->categorie_id = $request->input('categorie_id');
+        $ingredients = [];
+        foreach ($request->input('ingredients') as $ingredientId => $data) {
+            if (isset($data['selected']) && $data['selected'] == 1) {
+                $ingredient = Ingredient::find($ingredientId);
+                $quantity = $data['quantity'] ?? 0;
+                $unit = $data['unit'] ?? '';
 
-         // Tambahkan bahan baru ke database
-        if ($request->has('new_ingredients')) {
-            foreach ($request->new_ingredients as $newIngredient) {
-                $ingredient = \App\Models\Ingredient::firstOrCreate([
-                    'name' => ucfirst($newIngredient)
-                ]);
-                $validatedData['ingredients'][] = $ingredient->id;
+                $ingredients[] = "{$ingredient->name} {$quantity} {$unit}";
             }
         }
-        
-        if ($request->has('ingredients')) {
-            $recipe->ingredients()->sync($validatedData['ingredients']);
-        }
-   
 
+    
+        // Menyimpan ingredients dalam format yang dapat disimpan di database
+        $recipe->ingredients = json_encode($ingredients);
+    
+        // Menyimpan resep ke database
         $recipe->save();
     
-        // Redirect with a success message
-        return redirect()->route('recipes.index')->with('success', 'Recipe created successfully!');
+        return redirect()->route('recipes.index')->with('success', 'Recipe created successfully');
     }
     
 

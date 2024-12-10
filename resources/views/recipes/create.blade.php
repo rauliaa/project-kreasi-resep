@@ -31,11 +31,6 @@
             <textarea name="description" id="description" class="form-control" rows="3" required>{{ old('description') }}</textarea>
         </div>
 
-        <div class="form-group">
-            <label for="instructions">Instructions</label>
-            <textarea class="form-control" id="instructions" name="instructions[]" rows="5" placeholder="Enter each step on a new line" required>{{ old('instructions') }}</textarea>
-        </div>
-
         <!-- Pilihan Ingredients dari daftar yang dikelompokkan -->
         <div class="mb-3">
             <label for="ingredients" class="form-label">Ingredients</label>
@@ -49,12 +44,27 @@
                         <h5 class="fw-bold">{{ $letter }}</h5>
                         <div class="row">
                             @foreach($ingredientsGroup as $ingredient)
-                                <div class="col-12 mb-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input ingredient-checkbox" type="checkbox" name="ingredients[]" value="{{ $ingredient->id }}" id="ingredient-{{ $ingredient->id }}">
-                                        <label class="form-check-label" for="ingredient-{{ $ingredient->id }}">
+                                <div class="col-12 mb-2">
+                                    <div class="form-check d-flex align-items-center">
+                                        <!-- Checkbox Bahan -->
+                                        <input class="form-check-input me-2 ingredient-checkbox" type="checkbox" 
+                                            name="ingredients[{{ $ingredient->id }}][selected]" 
+                                            value="1" id="ingredient-{{ $ingredient->id }}">
+
+                                        <!-- Label Nama Bahan -->
+                                        <label class="form-check-label me-3" for="ingredient-{{ $ingredient->id }}">
                                             {{ $ingredient->name }}
                                         </label>
+
+                                        <!-- Input Quantity -->
+                                        <input type="number" class="form-control form-control-sm me-2 quantity-input" 
+                                            name="ingredients[{{ $ingredient->id }}][quantity]" 
+                                            placeholder="Qty" min="0" step="0.1" style="width: 80px;" disabled>
+
+                                        <!-- Input Unit -->
+                                        <input type="text" class="form-control form-control-sm unit-input" 
+                                            name="ingredients[{{ $ingredient->id }}][unit]" 
+                                            placeholder="Unit" style="width: 100px;" disabled>
                                     </div>
                                 </div>
                             @endforeach
@@ -64,6 +74,10 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label for="instructions">Instructions</label>
+            <textarea class="form-control" id="instructions" name="instructions[]" rows="5" placeholder="Enter each step on a new line" required>{{ old('instructions') }}</textarea>
+        </div>
 
 
         <div class="mb-3">
@@ -178,6 +192,20 @@ $('#add-new-ingredient-btn').on('click', function() {
         // Reset input dan sembunyikan tombol
         $('#search-box').val('');
         $('#add-new-ingredient-btn').hide();
+    }
+});
+$(document).on('change', '.ingredient-checkbox', function() {
+    let isChecked = $(this).is(':checked');
+    let quantityInput = $(this).closest('.form-check').find('.quantity-input');
+    let unitInput = $(this).closest('.form-check').find('.unit-input');
+
+    // Aktifkan atau nonaktifkan input berdasarkan checkbox
+    if (isChecked) {
+        quantityInput.prop('disabled', false);
+        unitInput.prop('disabled', false);
+    } else {
+        quantityInput.prop('disabled', true).val('');
+        unitInput.prop('disabled', true).val('');
     }
 });
 </script>

@@ -178,11 +178,15 @@
                     <div class="tab-pane fade show active" id="bahan">
                         <h2>Bahan-bahan</h2>
                         <div class="section-content">
-                            @foreach(explode("\n", $recipe->ingredients) as $ingredient)
-                                <li>{{ $ingredient }}</li>
-                            @endforeach
+                            <ul>
+                                @foreach (json_decode($recipe->ingredients) as $ingredient)
+                                    <li>{{ $ingredient }}</li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
+            
+
 
                     <!-- Cooking Instructions Section -->
                     <div class="tab-pane fade" id="cara-memasak">
